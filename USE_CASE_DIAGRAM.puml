@@ -1,0 +1,185 @@
+@startuml E-Commerce System Use Case Diagram
+
+!define ACTOR_BG_COLOR #E1F5FE
+!define USECASE_BG_COLOR #80DEEA
+
+skinparam actor {
+    BackgroundColor ACTOR_BG_COLOR
+    BorderColor #01579B
+    FontColor #01579B
+}
+
+skinparam usecase {
+    BackgroundColor USECASE_BG_COLOR
+    BorderColor #00838F
+    FontColor #00838F
+}
+
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor #01579B
+    BorderThickness 2
+}
+
+' Set vertical layout
+skinparam direction left to right
+
+' Actors
+:Admin: as admin
+:User: as user
+
+' Authentication Use Cases
+(Login) as login
+(Logout) as logout
+
+' User Shopping Use Cases
+(Browse Products) as browse
+(Search Products) as search
+(View Product Details) as viewDetail
+(Filter by Category) as filter
+(Add to Cart) as addCart
+(Update Cart Quantity) as updateCart
+(Remove from Cart) as removeCart
+(View Cart) as viewCart
+(Add to Wishlist) as addWishlist
+(Remove from Wishlist) as removeWishlist
+(View Wishlist) as viewWishlist
+
+' Checkout & Order Use Cases
+(Manage Addresses) as manageAddr
+(Place Order) as placeOrder
+(Select Payment Method) as selectPayment
+(View Order History) as viewOrders
+(Track Order Status) as trackOrder
+(Cancel Order) as cancelOrder
+
+' Profile & Support Use Cases
+(View Profile) as viewProfile
+(Edit Profile) as editProfile
+(Upload Profile Picture) as uploadPic
+(Submit Contact Form) as contact
+
+' Admin Product Management Use Cases
+(Create Product) as createProd
+(Edit Product) as editProd
+(Delete Product) as deleteProd
+(Restore Product) as restoreProd
+(View All Products) as viewAllProd
+
+' Admin Inventory Use Cases
+(Manage Stock Levels) as manageStock
+(Set Product Price) as setPrice
+(Manage Categories) as manageCategories
+
+' Admin Order Management Use Cases
+(View All Orders) as viewAllOrders
+(Track Fulfillment) as trackFulfill
+(Process Refunds) as refund
+
+' Admin User Management Use Cases
+(View All Users) as viewAllUsers
+(View Login History) as loginHistory
+(Monitor User Activity) as monitorActivity
+
+' Admin Other Use Cases
+(View Contact Messages) as viewMessages
+(Bulk Upload Products) as bulkUpload
+(Generate Reports) as reports
+(Access Admin Panel) as adminPanel
+
+' User to Authentication
+user --> login
+user --> logout
+
+' User Shopping Layer
+user --> browse
+user --> search
+browse --> viewDetail
+search --> viewDetail
+viewDetail --> filter
+
+' User Cart Operations
+viewDetail --> addCart
+addCart --> updateCart
+addCart --> removeCart
+addCart --> viewCart
+viewDetail --> addWishlist
+addWishlist --> removeWishlist
+addWishlist --> viewWishlist
+
+' User Checkout Flow
+viewCart --> manageAddr
+manageAddr --> selectPayment
+selectPayment --> placeOrder
+placeOrder --> viewOrders
+viewOrders --> trackOrder
+viewOrders --> cancelOrder
+
+' User Profile Flow
+login --> viewProfile
+viewProfile --> editProfile
+editProfile --> uploadPic
+login --> contact
+
+' Admin Authentication
+admin --> login
+admin --> logout
+
+' Admin Product Management
+admin --> adminPanel
+adminPanel --> createProd
+adminPanel --> editProd
+adminPanel --> deleteProd
+adminPanel --> restoreProd
+adminPanel --> viewAllProd
+adminPanel --> manageCategories
+
+' Admin Inventory
+adminPanel --> manageStock
+adminPanel --> setPrice
+
+' Admin Orders
+adminPanel --> viewAllOrders
+adminPanel --> trackFulfill
+adminPanel --> refund
+
+' Admin Users
+adminPanel --> viewAllUsers
+adminPanel --> loginHistory
+adminPanel --> monitorActivity
+
+' Admin Other
+adminPanel --> viewMessages
+adminPanel --> bulkUpload
+adminPanel --> reports
+
+' Include relationships (for shared/base use cases)
+login --|> browse : extended by User
+login --|> adminPanel : extended by Admin
+
+' Included relationships (dependencies)
+placeOrder --|> viewCart : includes
+placeOrder --|> manageAddr : includes
+placeOrder --|> selectPayment : includes
+editProd --|> manageStock : includes
+createProd --|> manageCategories : includes
+
+note right of user
+  Regular customers who browse,
+  shop, and manage orders
+end note
+
+note left of admin
+  System administrators who
+  manage products, inventory,
+  users, and orders
+end note
+
+note bottom
+  ** E-Commerce Platform Use Cases **
+  Frontend: React (Vite)
+  Backend: Express.js (Node.js)
+  Database: MongoDB
+end note
+
+@enduml

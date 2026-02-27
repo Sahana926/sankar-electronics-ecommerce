@@ -1,0 +1,340 @@
+/* Report Pages Styles */
+
+/* Filter Cards Section */
+.filter-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  margin-top: 1.5rem;
+}
+
+.filter-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #3b82f6;
+}
+
+.filter-card.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #1d4ed8;
+  color: white;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.filter-card .filter-icon {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.filter-card .filter-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.filter-card.active .filter-label {
+  color: white;
+}
+
+.filter-card .filter-count {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-top: 0.25rem;
+}
+
+.filter-card.active .filter-count {
+  color: white;
+  font-size: 2rem;
+}
+
+/* Report Summary */
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+}
+
+.summary-item .label {
+  font-weight: 600;
+  color: #374151;
+  margin-right: 1rem;
+}
+
+.summary-item .value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.summary-item .value.currency {
+  color: #10b981;
+  font-size: 1.5rem;
+}
+
+/* Revenue Summary */
+.revenue-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.revenue-summary .summary-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.revenue-summary .summary-card.large {
+  grid-column: span 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.summary-card .summary-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.revenue-summary .summary-card.large .summary-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-card .summary-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.revenue-summary .summary-card.large .summary-value {
+  color: white;
+  font-size: 2.5rem;
+}
+
+.summary-value.currency {
+  color: #059669;
+  font-size: 1.875rem;
+}
+
+/* Alert Box Styles */
+.alert-box {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  border-left: 4px solid;
+}
+
+.alert-box.warning {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.alert-box.warning .alert-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.alert-box.danger {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.alert-box.danger .alert-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.alert-message {
+  flex: 1;
+}
+
+/* Stock Warning */
+.stock-warning {
+  color: #dc2626;
+  font-weight: 600;
+  background-color: #fee2e2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Payment Method Badge */
+.payment-method {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.payment-method.upi {
+  background-color: #dbeafe;
+  color: #0c4a6e;
+}
+
+.payment-method.card {
+  background-color: #d1fae5;
+  color: #064e3b;
+}
+
+.payment-method.cod {
+  background-color: #fce7f3;
+  color: #831843;
+}
+
+.payment-method.wallet {
+  background-color: #e9d5ff;
+  color: #581c87;
+}
+
+/* Search Bar */
+.search-bar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.status-badge.admin {
+  background-color: #dbeafe;
+  color: #0c4a6e;
+}
+
+.status-badge.user {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.inactive {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filter-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-summary .summary-card.large {
+    grid-column: span 1;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .filter-card {
+    min-width: auto;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+}

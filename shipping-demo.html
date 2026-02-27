@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Calculator Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .price {
+            color: #667eea;
+            font-size: 24px !important;
+        }
+
+        .error {
+            background: #fee;
+            border-left-color: #f44;
+            color: #c00;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .zone-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .zone-local {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .zone-zonal {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .zone-national {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #0066cc;
+        }
+
+        .zones-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .zones-info h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .zone-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Shipping Calculator</h1>
+        <p class="subtitle">Calculate delivery charges based on your pincode</p>
+
+        <div class="info-box">
+            ℹ️ Enter a valid 6-digit Indian pincode to calculate delivery charges and estimated delivery time.
+        </div>
+
+        <form id="shippingForm">
+            <div class="form-group">
+                <label for="pincode">Delivery Pincode</label>
+                <input 
+                    type="text" 
+                    id="pincode" 
+                    placeholder="e.g., 400001" 
+                    maxlength="6"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="weight">Package Weight (kg)</label>
+                <input 
+                    type="number" 
+                    id="weight" 
+                    placeholder="e.g., 5" 
+                    min="0.1"
+                    step="0.1"
+                    value="5"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn" id="calculateBtn">
+                Calculate Shipping
+            </button>
+        </form>
+
+        <div id="result"></div>
+
+        <div class="zones-info">
+            <h4>📊 Shipping Zones</h4>
+            <div class="zone-item">
+                <span class="zone-badge zone-local">LOCAL</span>
+                0-50 km → ₹40 (2 days)
+            </div>
+            <div class="zone-item">
+                <span class="zone-badge zone-zonal">ZONAL</span>
+                51-300 km → ₹70 (4 days)
+            </div>
+            <div class="zone-item">
+                <span class="zone-badge zone-national">NATIONAL</span>
+                >300 km → ₹100 (7 days)
+            </div>
+            <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                💡 Additional ₹10/kg charged for packages over 5kg
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5001/api/shipping';
+        
+        const form = document.getElementById('shippingForm');
+        const pincodeInput = document.getElementById('pincode');
+        const weightInput = document.getElementById('weight');
+        const resultDiv = document.getElementById('result');
+        const calculateBtn = document.getElementById('calculateBtn');
+
+        // Only allow numbers in pincode
+        pincodeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const pincode = pincodeInput.value.trim();
+            const weight = parseFloat(weightInput.value);
+
+            if (pincode.length !== 6) {
+                showError('Please enter a valid 6-digit pincode');
+                return;
+            }
+
+            if (weight <= 0) {
+                showError('Weight must be greater than 0');
+                return;
+            }
+
+            await calculateShipping(pincode, weight);
+        });
+
+        async function calculateShipping(pincode, weight) {
+            // Show loading
+            calculateBtn.disabled = true;
+            calculateBtn.textContent = 'Calculating...';
+            resultDiv.innerHTML = '<div class="result loading">⏳ Calculating shipping charges...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/calculate-shipping`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        deliveryPincode: pincode,
+                        cartWeight: weight
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult(data.data);
+                } else {
+                    showError(data.error || 'Failed to calculate shipping');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to connect to server. Make sure the server is running on port 5001.');
+            } finally {
+                calculateBtn.disabled = false;
+                calculateBtn.textContent = 'Calculate Shipping';
+            }
+        }
+
+        function showResult(data) {
+            const zoneClass = `zone-${data.zone.toLowerCase()}`;
+            
+            let html = `
+                <div class="result">
+                    <h3>✅ Delivery Information</h3>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Zone</span>
+                        <span class="result-value">
+                            <span class="zone-badge ${zoneClass}">${data.zone}</span>
+                        </span>
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Distance</span>
+                        <span class="result-value">${data.distance} km</span>
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Base Charge</span>
+                        <span class="result-value">₹${data.baseCharge}</span>
+                    </div>
+            `;
+
+            if (data.weightCharge > 0) {
+                html += `
+                    <div class="result-row">
+                        <span class="result-label">Weight Surcharge</span>
+                        <span class="result-value">₹${data.weightCharge}</span>
+                    </div>
+                `;
+            }
+
+            html += `
+                    <div class="result-row">
+                        <span class="result-label">Total Delivery Charge</span>
+                        <span class="result-value price">₹${data.deliveryCharge}</span>
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Estimated Delivery</span>
+                        <span class="result-value">${data.estimatedDays} days</span>
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Delivering to</span>
+                        <span class="result-value">${data.deliveryCity}, ${data.deliveryState}</span>
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Package Weight</span>
+                        <span class="result-value">${data.cartWeight} kg</span>
+                    </div>
+                </div>
+            `;
+
+            resultDiv.innerHTML = html;
+        }
+
+        function showError(message) {
+            resultDiv.innerHTML = `
+                <div class="result error">
+                    <h3>❌ Error</h3>
+                    <p style="margin-top: 10px;">${message}</p>
+                </div>
+            `;
+        }
+
+        // Example pincodes for testing
+        console.log('📍 Try these pincodes:');
+        console.log('Local: 110002 (Delhi)');
+        console.log('Zonal: 201301 (Noida)');
+        console.log('National: 400001 (Mumbai), 560001 (Bangalore)');
+    </script>
+</body>
+</html>
