@@ -23,7 +23,7 @@ import productsRoutes from './routes/products.js';
 import shippingRoutes from './routes/shipping.js';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
