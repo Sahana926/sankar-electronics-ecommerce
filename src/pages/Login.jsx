@@ -22,7 +22,7 @@ function Login() {
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://sankar-electronics-backend.onrender.com'
 
   const handleChange = (e) => {
     const { name, value } = e.target

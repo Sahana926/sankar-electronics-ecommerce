@@ -24,7 +24,7 @@ function Signup() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [emailCheckLoading, setEmailCheckLoading] = useState(false)
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://sankar-electronics-backend.onrender.com'
 
   // Password validation function
   // Must contain: at least one letter, one number, and one special character
