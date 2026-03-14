@@ -181,7 +181,14 @@ function AdminOrders() {
                         <option value="pending">Pending</option>
                         <option value="paid">Paid</option>
                         <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
                       </select>
+                      {o.refund?.status && o.refund.status !== 'none' && (
+                        <div className="refund-meta">
+                          <div>Refund: {o.refund.status}</div>
+                          {o.refund.refundId && <div>ID: {o.refund.refundId}</div>}
+                        </div>
+                      )}
                     </td>
                     <td data-label="Actions">
                       <div className="admin-order-actions">

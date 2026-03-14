@@ -1,8 +1,16 @@
 import express from 'express'
 import Order from '../models/Order.js'
 import { authenticateToken, requireAdmin } from '../middleware/auth.js'
+import Razorpay from 'razorpay'
 
 const router = express.Router()
+
+const getRazorpay = () => {
+  const keyId = process.env.RAZORPAY_KEY_ID || ''
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || ''
+  if (!keyId || !keySecret) return null
+  return new Razorpay({ key_id: keyId, key_secret: keySecret })
+}
 
 const parseNumber = (value, fallback) => {
   const n = Number(value)
@@ -125,9 +133,67 @@ router.patch('/:id/return-review', authenticateToken, requireAdmin, async (req, 
     order.returnRequest.reviewedAt = new Date()
     order.returnRequest.reviewNote = note
 
-    // Auto-mark refund for prepaid orders when return is approved
+    // Auto-refund prepaid orders when return is approved
     if (decision === 'approved' && order.paymentMethod !== 'cod') {
-      order.paymentStatus = 'refunded'
+      const paymentId = String(order.transactionId || '')
+
+      if (paymentId.startsWith('pay_')) {
+        const rzp = getRazorpay()
+        if (!rzp) {
+          return res.status(500).json({
+            message: 'Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET on backend.',
+          })
+        }
+
+        const amountInPaise = Math.round((order.total || 0) * 100)
+        if (amountInPaise <= 0) {
+          return res.status(400).json({ message: 'Invalid order amount for refund.' })
+        }
+
+        try {
+          const refund = await rzp.payments.refund(paymentId, {
+            amount: amountInPaise,
+            notes: {
+              orderNumber: order.orderNumber,
+              reason: 'Damaged product return approved',
+            },
+          })
+
+          order.paymentStatus = 'refunded'
+          order.refund = {
+            status: 'processed',
+            method: 'razorpay',
+            amount: amountInPaise / 100,
+            paymentId,
+            refundId: refund.id || '',
+            processedAt: new Date(),
+            note: 'Refund processed via Razorpay',
+          }
+        } catch (refundError) {
+          order.refund = {
+            status: 'failed',
+            method: 'razorpay',
+            amount: amountInPaise / 100,
+            paymentId,
+            refundId: '',
+            processedAt: null,
+            note: refundError?.message || 'Razorpay refund failed',
+          }
+          await order.save()
+          return res.status(500).json({ message: `Refund failed: ${refundError?.message || 'Unknown error'}` })
+        }
+      } else {
+        // Non-Razorpay transaction IDs require manual payout.
+        order.refund = {
+          status: 'manual_required',
+          method: 'manual',
+          amount: Number(order.total || 0),
+          paymentId,
+          refundId: '',
+          processedAt: null,
+          note: 'Automatic refund unavailable for this transaction. Process manually.',
+        }
+      }
     }
 
     await order.save()

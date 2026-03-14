@@ -104,6 +104,38 @@ const orderSchema = new mongoose.Schema({
       default: '',
     },
   },
+  refund: {
+    status: {
+      type: String,
+      enum: ['none', 'processed', 'failed', 'manual_required'],
+      default: 'none',
+    },
+    method: {
+      type: String,
+      enum: ['none', 'razorpay', 'manual'],
+      default: 'none',
+    },
+    amount: {
+      type: Number,
+      default: 0,
+    },
+    paymentId: {
+      type: String,
+      default: '',
+    },
+    refundId: {
+      type: String,
+      default: '',
+    },
+    processedAt: {
+      type: Date,
+      default: null,
+    },
+    note: {
+      type: String,
+      default: '',
+    },
+  },
 }, {
   timestamps: true,
 })

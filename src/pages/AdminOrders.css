@@ -246,6 +246,13 @@
   cursor: not-allowed;
 }
 
+.refund-meta {
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #334155;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {
