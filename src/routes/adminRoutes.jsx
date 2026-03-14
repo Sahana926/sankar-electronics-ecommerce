@@ -7,6 +7,7 @@ const AdminProducts = lazy(() => import('../pages/AdminProducts'))
 const AdminProductEdit = lazy(() => import('../pages/AdminProductEdit'))
 const AdminOrders = lazy(() => import('../pages/AdminOrders'))
 const ContactMessages = lazy(() => import('../pages/ContactMessages'))
+const SalesReport = lazy(() => import('../pages/reports/SalesReport'))
 const ProductsReport = lazy(() => import('../pages/reports/ProductsReport'))
 const OrdersReport = lazy(() => import('../pages/reports/OrdersReport'))
 const UsersReport = lazy(() => import('../pages/reports/UsersReport'))
@@ -65,6 +66,14 @@ export const adminRoutes = [
     element: (
       <AdminProtectedRoute>
         <ContactMessages />
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/reports/sales',
+    element: (
+      <AdminProtectedRoute>
+        <SalesReport />
       </AdminProtectedRoute>
     ),
   },

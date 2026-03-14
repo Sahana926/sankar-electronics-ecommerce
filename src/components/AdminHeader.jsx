@@ -52,6 +52,13 @@ function AdminHeader() {
             <span className="nav-icon">📊</span>
             <span className="nav-text">Dashboard</span>
           </Link>
+          <Link
+            to="/admin/reports/sales"
+            className={`admin-nav-link ${isActive('/admin/reports/sales') ? 'active' : ''}`}
+          >
+            <span className="nav-icon">📈</span>
+            <span className="nav-text">Sales Report</span>
+          </Link>
           <Link 
             to="/admin/inventory" 
             className={`admin-nav-link ${isActive('/admin/inventory') || isActive('/admin/products') ? 'active' : ''}`}

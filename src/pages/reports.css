@@ -304,6 +304,70 @@
   color: #6b7280;
 }
 
+/* Sales report graph */
+.sales-report-card {
+  margin: 0 0 1.6rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  padding: 1rem;
+}
+
+.sales-report-title {
+  margin: 0 0 0.85rem 0;
+  font-size: 1.05rem;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.sales-report-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.sales-report-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.sales-item {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sales-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  font-size: 0.86rem;
+}
+
+.sales-item-name {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.sales-item-meta {
+  color: #334155;
+}
+
+.sales-item-track {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.sales-item-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
+  transition: width 0.35s ease;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .filter-cards {
@@ -336,5 +400,10 @@
 
   .page-title {
     font-size: 1.5rem;
+  }
+
+  .sales-item-head {
+    flex-direction: column;
+    gap: 0.25rem;
   }
 }

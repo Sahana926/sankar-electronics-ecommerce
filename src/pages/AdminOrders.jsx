@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import AdminHeader from '../components/AdminHeader'
 import { getToken } from '../utils/tokenManager'
@@ -11,29 +11,6 @@ function AdminOrders() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isReviewingReturn, setIsReviewingReturn] = useState({})
-
-  const topSoldProducts = useMemo(() => {
-    const salesMap = new Map()
-
-    orders.forEach((order) => {
-      ;(order.items || []).forEach((item) => {
-        const name = item?.name || 'Unnamed Product'
-        const qty = Number(item?.quantity || 0)
-        const revenue = Number(item?.price || 0) * qty
-
-        const existing = salesMap.get(name) || { name, qty: 0, revenue: 0 }
-        existing.qty += qty
-        existing.revenue += revenue
-        salesMap.set(name, existing)
-      })
-    })
-
-    return Array.from(salesMap.values())
-      .sort((a, b) => b.qty - a.qty)
-      .slice(0, 7)
-  }, [orders])
-
-  const maxSoldQty = topSoldProducts.length > 0 ? topSoldProducts[0].qty : 1
 
   const fetchOrders = async () => {
     try {
@@ -168,31 +145,6 @@ function AdminOrders() {
       <div className="container">
         <div className="page-container">
           <h2 className="page-title">Admin Orders</h2>
-
-          <section className="sales-report-card" aria-label="Most sold products report">
-            <h3 className="sales-report-title">Most Sold Products</h3>
-            {topSoldProducts.length === 0 ? (
-              <p className="sales-report-empty">No order data available yet.</p>
-            ) : (
-              <div className="sales-report-list">
-                {topSoldProducts.map((product) => {
-                  const widthPercent = Math.max(8, Math.round((product.qty / maxSoldQty) * 100))
-                  return (
-                    <div className="sales-item" key={product.name}>
-                      <div className="sales-item-head">
-                        <span className="sales-item-name">{product.name}</span>
-                        <span className="sales-item-meta">{product.qty} sold | ₹{product.revenue}</span>
-                      </div>
-                      <div className="sales-item-track">
-                        <div className="sales-item-bar" style={{ width: `${widthPercent}%` }} />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </section>
-
           <div className="table-wrapper">
             <table className="data-table">
               <thead>
