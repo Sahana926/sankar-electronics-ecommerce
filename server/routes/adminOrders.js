@@ -125,13 +125,17 @@ router.patch('/:id/return-review', authenticateToken, requireAdmin, async (req, 
       return res.status(404).json({ message: 'Order not found' })
     }
 
-    if (!order.returnRequest || order.returnRequest.status !== 'requested') {
+    const currentReturnStatus = order.returnRequest?.status || 'none'
+    if (currentReturnStatus !== 'requested') {
+      // Idempotent response to avoid confusing duplicate-click errors in admin UI.
+      if ((decision === 'approved' && currentReturnStatus === 'approved') || (decision === 'rejected' && currentReturnStatus === 'rejected')) {
+        return res.json({
+          message: `Return request already ${currentReturnStatus}`,
+          order,
+        })
+      }
       return res.status(400).json({ message: 'No pending return request found for this order.' })
     }
-
-    order.returnRequest.status = decision
-    order.returnRequest.reviewedAt = new Date()
-    order.returnRequest.reviewNote = note
 
     // Auto-refund prepaid orders when return is approved
     if (decision === 'approved' && order.paymentMethod !== 'cod') {
@@ -160,6 +164,9 @@ router.patch('/:id/return-review', authenticateToken, requireAdmin, async (req, 
           })
 
           order.paymentStatus = 'refunded'
+          order.returnRequest.status = 'approved'
+          order.returnRequest.reviewedAt = new Date()
+          order.returnRequest.reviewNote = note
           order.refund = {
             status: 'processed',
             method: 'razorpay',
@@ -180,10 +187,13 @@ router.patch('/:id/return-review', authenticateToken, requireAdmin, async (req, 
             note: refundError?.message || 'Razorpay refund failed',
           }
           await order.save()
-          return res.status(500).json({ message: `Refund failed: ${refundError?.message || 'Unknown error'}` })
+          return res.status(500).json({ message: `Refund failed: ${refundError?.message || 'Unknown error'}. Return request is still pending.` })
         }
       } else {
         // Non-Razorpay transaction IDs require manual payout.
+        order.returnRequest.status = 'approved'
+        order.returnRequest.reviewedAt = new Date()
+        order.returnRequest.reviewNote = note
         order.refund = {
           status: 'manual_required',
           method: 'manual',
@@ -194,6 +204,10 @@ router.patch('/:id/return-review', authenticateToken, requireAdmin, async (req, 
           note: 'Automatic refund unavailable for this transaction. Process manually.',
         }
       }
+    } else {
+      order.returnRequest.status = decision
+      order.returnRequest.reviewedAt = new Date()
+      order.returnRequest.reviewNote = note
     }
 
     await order.save()

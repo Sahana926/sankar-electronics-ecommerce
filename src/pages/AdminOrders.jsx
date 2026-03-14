@@ -119,6 +119,9 @@ function AdminOrders() {
 
       const data = await res.json()
       if (!res.ok) {
+        if (String(data.message || '').toLowerCase().includes('no pending return request')) {
+          fetchOrders()
+        }
         return toast.error(data.message || 'Failed to review return request')
       }
 
