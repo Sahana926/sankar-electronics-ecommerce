@@ -191,6 +191,7 @@ function Orders() {
   const getStatusStyles = (status) => {
     const map = {
       delivered: { color: '#1F7A47', bg: 'rgba(39, 174, 96, 0.12)', border: '#27ae60' },
+      refund_completed: { color: '#155e75', bg: 'rgba(6, 182, 212, 0.14)', border: '#06b6d4' },
       shipped: { color: '#1B6CA8', bg: 'rgba(52, 152, 219, 0.12)', border: '#3498db' },
       processing: { color: '#9A6906', bg: 'rgba(243, 156, 18, 0.14)', border: '#f39c12' },
       cancelled: { color: '#9E2B2B', bg: 'rgba(231, 76, 60, 0.14)', border: '#e74c3c' },
@@ -273,7 +274,10 @@ function Orders() {
               {orders
                 .filter(order => showCancelled || order.status !== 'cancelled')
                 .map((order) => {
-                  const s = getStatusStyles(order.status)
+                  const isRefundCompleted = order.paymentStatus === 'refunded' || order.refund?.status === 'processed'
+                  const statusKey = isRefundCompleted ? 'refund_completed' : order.status
+                  const statusLabel = isRefundCompleted ? 'Refund Completed' : toTitle(order.status)
+                  const s = getStatusStyles(statusKey)
                   const returnStatus = order.returnRequest?.status || 'none'
                   const returnWindowOpen = isReturnWindowOpen(order)
                   const canRequestReturn = order.status === 'delivered' && returnWindowOpen && !['requested', 'approved', 'completed'].includes(returnStatus)
@@ -303,7 +307,7 @@ function Orders() {
                         textTransform: 'none'
                       }}
                     >
-                      {toTitle(order.status)}
+                      {statusLabel}
                     </span>
                   </div>
 
