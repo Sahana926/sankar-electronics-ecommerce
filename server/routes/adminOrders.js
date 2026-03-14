@@ -66,12 +66,15 @@ router.patch('/:id/status', authenticateToken, requireAdmin, async (req, res) =>
     const allowed = ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled']
     if (!allowed.includes(status)) return res.status(400).json({ message: 'Invalid status' })
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    )
+    const order = await Order.findById(req.params.id)
     if (!order) return res.status(404).json({ message: 'Order not found' })
+
+    order.status = status
+    if (status === 'delivered' && !order.deliveredAt) {
+      order.deliveredAt = new Date()
+    }
+    await order.save()
+
     res.json({ message: 'Status updated', order })
   } catch (error) {
     console.error('Admin update order status error:', error)
@@ -96,6 +99,46 @@ router.patch('/:id/payment', authenticateToken, requireAdmin, async (req, res) =
   } catch (error) {
     console.error('Admin update payment status error:', error)
     res.status(500).json({ message: 'Failed to update payment status' })
+  }
+})
+
+// Review return request (approve/reject)
+router.patch('/:id/return-review', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const decision = String(req.body?.decision || '').toLowerCase()
+    const note = String(req.body?.note || '').trim()
+
+    if (!['approved', 'rejected'].includes(decision)) {
+      return res.status(400).json({ message: 'Invalid decision. Use approved or rejected.' })
+    }
+
+    const order = await Order.findById(req.params.id)
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' })
+    }
+
+    if (!order.returnRequest || order.returnRequest.status !== 'requested') {
+      return res.status(400).json({ message: 'No pending return request found for this order.' })
+    }
+
+    order.returnRequest.status = decision
+    order.returnRequest.reviewedAt = new Date()
+    order.returnRequest.reviewNote = note
+
+    // Auto-mark refund for prepaid orders when return is approved
+    if (decision === 'approved' && order.paymentMethod !== 'cod') {
+      order.paymentStatus = 'refunded'
+    }
+
+    await order.save()
+
+    return res.json({
+      message: decision === 'approved' ? 'Return request approved' : 'Return request rejected',
+      order,
+    })
+  } catch (error) {
+    console.error('Admin return review error:', error)
+    return res.status(500).json({ message: 'Failed to review return request' })
   }
 })
 

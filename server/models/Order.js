@@ -52,6 +52,10 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled'],
     default: 'processing',
   },
+  deliveredAt: {
+    type: Date,
+    default: null,
+  },
   shippingAddress: {
     street: String,
     city: String,
@@ -72,6 +76,33 @@ const orderSchema = new mongoose.Schema({
   transactionId: {
     type: String,
     default: '',
+  },
+  returnRequest: {
+    status: {
+      type: String,
+      enum: ['none', 'requested', 'approved', 'rejected', 'completed'],
+      default: 'none',
+    },
+    reason: {
+      type: String,
+      default: '',
+    },
+    details: {
+      type: String,
+      default: '',
+    },
+    requestedAt: {
+      type: Date,
+      default: null,
+    },
+    reviewedAt: {
+      type: Date,
+      default: null,
+    },
+    reviewNote: {
+      type: String,
+      default: '',
+    },
   },
 }, {
   timestamps: true,

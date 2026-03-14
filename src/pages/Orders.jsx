@@ -16,6 +16,7 @@ function Orders() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [isCancelling, setIsCancelling] = useState({}) // { [orderId]: boolean }
+  const [isRequestingReturn, setIsRequestingReturn] = useState({}) // { [orderId]: boolean }
   const [showCancelled, setShowCancelled] = useState(() => {
     try {
       const saved = localStorage.getItem('orders_showCancelled')
@@ -26,6 +27,8 @@ function Orders() {
   })
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(null)
   const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const RETURN_WINDOW_HOURS = 48
+  const RETURN_WINDOW_MS = RETURN_WINDOW_HOURS * 60 * 60 * 1000
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -95,6 +98,71 @@ function Orders() {
     }
   }
 
+  const requestReturn = async (order) => {
+    const damageReason = window.prompt('Please describe the damage (minimum 10 characters):')
+    if (damageReason === null) return
+
+    const reason = damageReason.trim()
+    if (reason.length < 10) {
+      toast.error('Please provide a valid damage description (minimum 10 characters).')
+      return
+    }
+
+    try {
+      const token = getToken('user')
+      setIsRequestingReturn((prev) => ({ ...prev, [order._id]: true }))
+
+      const payload = JSON.stringify({ damageReason: reason })
+      const endpoint = `${API_BASE}/api/orders/${order._id}/return-request`
+
+      let response = await fetch(endpoint, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: payload,
+      })
+
+      let data = {}
+      try {
+        data = await response.json()
+      } catch {
+        data = {}
+      }
+
+      // Fallback for older backends or proxies that do not allow PATCH
+      if (!response.ok && response.status === 404) {
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: payload,
+        })
+        try {
+          data = await response.json()
+        } catch {
+          data = {}
+        }
+      }
+
+      if (!response.ok) {
+        toast.error(data.message || 'Failed to submit return request')
+        return
+      }
+
+      toast.success('Return request submitted. Our team will review it soon.')
+      setOrders((prev) => prev.map((o) => (o._id === order._id ? data.order : o)))
+    } catch (error) {
+      console.error('Error requesting return:', error)
+      toast.error('Failed to submit return request. Please try again.')
+    } finally {
+      setIsRequestingReturn((prev) => ({ ...prev, [order._id]: false }))
+    }
+  }
+
   const fetchOrders = async () => {
     try {
       const token = getToken('user')
@@ -132,6 +200,13 @@ function Orders() {
   }
 
   const toTitle = (s) => s ? (s.charAt(0).toUpperCase() + s.slice(1)) : ''
+  const isReturnWindowOpen = (order) => {
+    const deliveredAt = order?.deliveredAt || order?.updatedAt
+    if (!deliveredAt) return false
+    const deliveredTime = new Date(deliveredAt).getTime()
+    if (!Number.isFinite(deliveredTime)) return false
+    return (Date.now() - deliveredTime) <= RETURN_WINDOW_MS
+  }
 
   if (loading) {
     return (
@@ -199,6 +274,9 @@ function Orders() {
                 .filter(order => showCancelled || order.status !== 'cancelled')
                 .map((order) => {
                   const s = getStatusStyles(order.status)
+                  const returnStatus = order.returnRequest?.status || 'none'
+                  const returnWindowOpen = isReturnWindowOpen(order)
+                  const canRequestReturn = order.status === 'delivered' && returnWindowOpen && !['requested', 'approved', 'completed'].includes(returnStatus)
                   return (
                   <div
                     key={order._id}
@@ -257,6 +335,21 @@ function Orders() {
                         >
                           {isCancelling[order._id] ? 'Cancelling...' : 'Cancel Order'}
                         </button>
+                      )}
+                      {canRequestReturn && (
+                        <button
+                          onClick={() => requestReturn(order)}
+                          className="order-action-btn return-btn"
+                          disabled={!!isRequestingReturn[order._id]}
+                        >
+                          {isRequestingReturn[order._id] ? 'Submitting...' : 'Return (Damaged)'}
+                        </button>
+                      )}
+                      {returnStatus === 'requested' && (
+                        <span className="order-return-chip">Return requested</span>
+                      )}
+                      {order.status === 'delivered' && !returnWindowOpen && returnStatus === 'none' && (
+                        <span className="order-return-chip">Return window closed</span>
                       )}
                     </div>
                   </div>

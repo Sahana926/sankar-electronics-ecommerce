@@ -6,6 +6,15 @@ const Login = lazy(() => import('../pages/Login'))
 const Signup = lazy(() => import('../pages/Signup'))
 const Products = lazy(() => import('../pages/Products'))
 const Contact = lazy(() => import('../pages/Contact'))
+const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'))
+const TermsAndConditions = lazy(() => import('../pages/TermsAndConditions'))
+const RefundCancellation = lazy(() => import('../pages/RefundCancellation'))
+const CookiePolicy = lazy(() => import('../pages/CookiePolicy'))
+const ShippingInformation = lazy(() => import('../pages/ShippingInformation'))
+const ReturnsReplacements = lazy(() => import('../pages/ReturnsReplacements'))
+const PaymentOptions = lazy(() => import('../pages/PaymentOptions'))
+const TrackOrder = lazy(() => import('../pages/TrackOrder'))
+const FAQs = lazy(() => import('../pages/FAQs'))
 const Shop = lazy(() => import('../pages/Shop'))
 const SwitchesAndSockets = lazy(() => import('../pages/SwitchesAndSockets'))
 const WiresAndCables = lazy(() => import('../pages/WiresAndCables'))
@@ -48,6 +57,42 @@ export const userRoutes = [
   {
     path: '/contact',
     element: <Contact />,
+  },
+  {
+    path: '/privacy-policy',
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: '/terms-and-conditions',
+    element: <TermsAndConditions />,
+  },
+  {
+    path: '/refund-cancellation',
+    element: <RefundCancellation />,
+  },
+  {
+    path: '/cookie-policy',
+    element: <CookiePolicy />,
+  },
+  {
+    path: '/shipping-information',
+    element: <ShippingInformation />,
+  },
+  {
+    path: '/returns-replacements',
+    element: <ReturnsReplacements />,
+  },
+  {
+    path: '/payment-options',
+    element: <PaymentOptions />,
+  },
+  {
+    path: '/track-order',
+    element: <TrackOrder />,
+  },
+  {
+    path: '/faqs',
+    element: <FAQs />,
   },
 
   // Protected Routes - Requires User Login

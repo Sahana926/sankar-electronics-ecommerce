@@ -6,6 +6,8 @@ import Product from '../models/Product.js'
 import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
+const RETURN_WINDOW_HOURS = 48
+const RETURN_WINDOW_MS = RETURN_WINDOW_HOURS * 60 * 60 * 1000
 
 // Get user's orders
 // By default, cancelled orders are excluded. Pass ?includeCancelled=true to include them.
@@ -236,8 +238,6 @@ router.post('/process-payment', authenticateToken, async (req, res) => {
   }
 })
 
-export default router
- 
 // Cancel an order
 router.patch('/:orderId/cancel', authenticateToken, async (req, res) => {
   try {
@@ -271,4 +271,64 @@ router.patch('/:orderId/cancel', authenticateToken, async (req, res) => {
     return res.status(500).json({ message: 'Server error. Please try again later.' })
   }
 })
+
+const handleReturnRequest = async (req, res) => {
+  try {
+    const { orderId } = req.params
+    const damageReason = String(req.body?.damageReason || '').trim()
+    const additionalDetails = String(req.body?.additionalDetails || '').trim()
+
+    if (!damageReason || damageReason.length < 10) {
+      return res.status(400).json({ message: 'Please provide damage details (minimum 10 characters).' })
+    }
+
+    const order = await Order.findOne({ _id: orderId, user: req.user._id })
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' })
+    }
+
+    if (order.status !== 'delivered') {
+      return res.status(400).json({ message: 'Return is available only after delivery.' })
+    }
+
+    const deliveredTime = order.deliveredAt ? new Date(order.deliveredAt).getTime() : new Date(order.updatedAt).getTime()
+    if (!Number.isFinite(deliveredTime)) {
+      return res.status(400).json({ message: 'Unable to verify delivery time for this order.' })
+    }
+
+    if ((Date.now() - deliveredTime) > RETURN_WINDOW_MS) {
+      return res.status(400).json({ message: `Return window closed. Returns are allowed within ${RETURN_WINDOW_HOURS} hours of delivery.` })
+    }
+
+    const existingStatus = order.returnRequest?.status || 'none'
+    if (['requested', 'approved', 'completed'].includes(existingStatus)) {
+      return res.status(400).json({ message: 'Return request already exists for this order.' })
+    }
+
+    order.returnRequest = {
+      status: 'requested',
+      reason: damageReason,
+      details: additionalDetails,
+      requestedAt: new Date(),
+      reviewedAt: null,
+      reviewNote: '',
+    }
+
+    await order.save()
+
+    return res.json({ message: 'Return request submitted successfully', order })
+  } catch (error) {
+    console.error('Return request error:', error)
+    return res.status(500).json({ message: 'Server error. Please try again later.' })
+  }
+}
+
+// Request return for damaged delivered order
+router.patch('/:orderId/return-request', authenticateToken, handleReturnRequest)
+
+// Compatibility endpoint for clients/proxies that block PATCH
+router.post('/:orderId/return-request', authenticateToken, handleReturnRequest)
+
+export default router
 
