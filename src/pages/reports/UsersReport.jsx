@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminProducts.css'
 import '../reports.css'
@@ -45,6 +46,30 @@ function UsersReport() {
     }
   }
 
+  const handleDownloadPdf = () => {
+    const adminCount = users.filter((u) => u.role === 'admin').length
+    const userCount = users.filter((u) => u.role === 'user').length
+
+    downloadReportPdf({
+      title: 'All Users Report',
+      fileName: 'users-report',
+      summaryLines: [
+        `Total Users: ${users.length}`,
+        `Filtered Users: ${filteredUsers.length}`,
+        `Admin Users: ${adminCount}`,
+        `Regular Users: ${userCount}`,
+      ],
+      headers: ['Name', 'Email', 'Phone', 'Role', 'Account Created'],
+      rows: filteredUsers.map((user) => [
+        user.fullName,
+        user.email,
+        user.phone || '-',
+        user.role,
+        new Date(user.createdAt).toLocaleString('en-IN'),
+      ]),
+    })
+  }
+
   if (loading) return <div className="admin-users"><div className="page-loading">Loading users...</div></div>
 
   return (
@@ -57,9 +82,14 @@ function UsersReport() {
               <h2 className="page-title">👥 All Users Report</h2>
               <p className="page-subtitle">Complete user list and details</p>
             </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-              ← Back to Dashboard
-            </button>
+            <div className="report-header-actions">
+              <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}

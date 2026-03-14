@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminProducts.css'
 import '../reports.css'
@@ -60,6 +61,25 @@ function OutOfStockReport() {
     }
   }
 
+  const handleDownloadPdf = () => {
+    downloadReportPdf({
+      title: 'Out of Stock Items Report',
+      fileName: 'out-of-stock-report',
+      summaryLines: [
+        `Out of Stock Products: ${products.length}`,
+      ],
+      headers: ['Product Name', 'SKU', 'Category', 'Price', 'Status', 'Last Updated'],
+      rows: products.map((product) => [
+        product.name,
+        product.sku || '-',
+        product.category || '-',
+        `INR ${product.price ?? 0}`,
+        product.status,
+        new Date(product.updatedAt).toLocaleString('en-IN'),
+      ]),
+    })
+  }
+
   if (loading) return <div className="admin-products"><div className="page-loading">Loading out of stock products...</div></div>
 
   return (
@@ -72,9 +92,14 @@ function OutOfStockReport() {
               <h2 className="page-title">❌ Out of Stock Items Report</h2>
               <p className="page-subtitle">Products with zero stock</p>
             </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-              ← Back to Dashboard
-            </button>
+            <div className="report-header-actions">
+              <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminOrders.css'
 import '../reports.css'
@@ -58,6 +59,24 @@ function SalesReport() {
   const maxSoldQty = topSoldProducts.length > 0 ? topSoldProducts[0].qty : 1
   const totalUnitsSold = topSoldProducts.reduce((sum, p) => sum + p.qty, 0)
 
+  const handleDownloadPdf = () => {
+    downloadReportPdf({
+      title: 'Sales Report',
+      fileName: 'sales-report',
+      summaryLines: [
+        `Total Orders: ${orders.length}`,
+        `Products in Ranking: ${topSoldProducts.length}`,
+        `Units Sold (Top List): ${totalUnitsSold}`,
+      ],
+      headers: ['Product Name', 'Units Sold', 'Revenue'],
+      rows: topSoldProducts.map((product) => [
+        product.name,
+        product.qty,
+        `INR ${product.revenue.toLocaleString('en-IN')}`,
+      ]),
+    })
+  }
+
   if (loading) {
     return <div className="page-loading">Loading sales report...</div>
   }
@@ -73,9 +92,14 @@ function SalesReport() {
                 <h2 className="page-title">Sales Report</h2>
                 <p className="page-subtitle">Most sold products based on ordered quantities</p>
               </div>
-              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-                Back to Dashboard
-              </button>
+              <div className="report-header-actions">
+                <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                  Download PDF
+                </button>
+                <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                  Back to Dashboard
+                </button>
+              </div>
             </div>
 
             {error && <div className="error-message">{error}</div>}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminProducts.css'
 import '../reports.css'
@@ -40,6 +41,27 @@ function ProductsReport() {
     p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleDownloadPdf = () => {
+    downloadReportPdf({
+      title: 'All Products Report',
+      fileName: 'products-report',
+      summaryLines: [
+        `Total Products: ${products.length}`,
+        `Active Products: ${products.filter((p) => p.status === 'active').length}`,
+        `Filtered Products: ${filteredProducts.length}`,
+      ],
+      headers: ['Product Name', 'SKU', 'Category', 'Price', 'Stock', 'Status'],
+      rows: filteredProducts.map((product) => [
+        product.name,
+        product.sku || '-',
+        product.category || '-',
+        `INR ${product.price ?? 0}`,
+        product.stockQty ?? 0,
+        product.status,
+      ]),
+    })
+  }
+
   if (loading) return <div className="admin-products"><div className="page-loading">Loading products...</div></div>
 
   return (
@@ -52,9 +74,14 @@ function ProductsReport() {
               <h2 className="page-title">📦 All Products Report</h2>
               <p className="page-subtitle">Complete inventory of all products</p>
             </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-              ← Back to Dashboard
-            </button>
+            <div className="report-header-actions">
+              <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}

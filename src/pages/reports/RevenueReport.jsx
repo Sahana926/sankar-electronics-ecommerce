@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminOrders.css'
 import '../reports.css'
@@ -38,6 +39,28 @@ function RevenueReport() {
 
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0)
   const averageOrderValue = orders.length > 0 ? (totalRevenue / orders.length).toFixed(2) : 0
+  const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+  const handleDownloadPdf = () => {
+    downloadReportPdf({
+      title: 'Revenue Report',
+      fileName: 'revenue-report',
+      summaryLines: [
+        `Total Revenue: INR ${totalRevenue.toLocaleString('en-IN')}`,
+        `Total Paid Orders: ${orders.length}`,
+        `Average Order Value: INR ${Number(averageOrderValue).toLocaleString('en-IN')}`,
+      ],
+      headers: ['Order #', 'User Email', 'Items', 'Order Amount', 'Payment Method', 'Date'],
+      rows: sortedOrders.map((order) => [
+        order.orderNumber,
+        order.userEmail,
+        order.items?.length || 0,
+        `INR ${order.total?.toLocaleString('en-IN') || 0}`,
+        order.paymentMethod?.toUpperCase(),
+        new Date(order.createdAt).toLocaleString('en-IN'),
+      ]),
+    })
+  }
 
   return (
     <main className="main-content admin-revenue">
@@ -49,9 +72,14 @@ function RevenueReport() {
               <h2 className="page-title">💰 Revenue Report</h2>
               <p className="page-subtitle">Complete revenue analysis and breakdown</p>
             </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-              ← Back to Dashboard
-            </button>
+            <div className="report-header-actions">
+              <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
@@ -89,9 +117,7 @@ function RevenueReport() {
               </thead>
               <tbody>
                 {orders.length > 0 ? (
-                  orders
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .map(order => (
+                  sortedOrders.map(order => (
                     <tr key={order._id}>
                       <td><strong>{order.orderNumber}</strong></td>
                       <td>{order.userEmail}</td>

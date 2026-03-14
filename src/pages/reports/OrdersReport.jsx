@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminOrders.css'
 import '../reports.css'
@@ -43,6 +44,32 @@ function OrdersReport() {
     return sum
   }, 0)
 
+  const paidOrders = orders.filter(
+    (o) => o.paymentStatus === 'paid' || o.paymentStatus === 'success'
+  ).length
+
+  const handleDownloadPdf = () => {
+    downloadReportPdf({
+      title: 'All Orders Report',
+      fileName: 'orders-report',
+      summaryLines: [
+        `Total Orders: ${orders.length}`,
+        `Paid Orders: ${paidOrders}`,
+        `Total Revenue: INR ${totalRevenue.toLocaleString('en-IN')}`,
+      ],
+      headers: ['Order #', 'User Email', 'Amount', 'Items', 'Payment', 'Status', 'Date'],
+      rows: orders.map((order) => [
+        order.orderNumber,
+        order.userEmail,
+        `INR ${order.total?.toLocaleString('en-IN') || 0}`,
+        `${order.items?.length || 0} item(s)`,
+        order.paymentStatus,
+        order.status,
+        new Date(order.createdAt).toLocaleString('en-IN'),
+      ]),
+    })
+  }
+
   return (
     <main className="main-content admin-orders">
       <AdminHeader />
@@ -53,9 +80,14 @@ function OrdersReport() {
               <h2 className="page-title">🛒 All Orders Report</h2>
               <p className="page-subtitle">Complete order history and details</p>
             </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-              ← Back to Dashboard
-            </button>
+            <div className="report-header-actions">
+              <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
@@ -67,7 +99,7 @@ function OrdersReport() {
             </div>
             <div className="summary-item">
               <span className="label">Paid Orders:</span>
-              <span className="value">{orders.filter(o => o.paymentStatus === 'paid' || o.paymentStatus === 'success').length}</span>
+              <span className="value">{paidOrders}</span>
             </div>
             <div className="summary-item">
               <span className="label">Total Revenue:</span>

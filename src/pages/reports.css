@@ -275,6 +275,23 @@
   margin: 0;
 }
 
+.report-header-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-pdf-download {
+  background: #16a34a;
+  color: white;
+  border: 1px solid #15803d;
+}
+
+.btn-pdf-download:hover {
+  background: #15803d;
+  border-color: #166534;
+}
+
 /* Status Badge */
 .status-badge {
   display: inline-block;
@@ -384,6 +401,14 @@
 
   .page-header {
     flex-direction: column;
+  }
+
+  .report-header-actions {
+    width: 100%;
+  }
+
+  .report-header-actions .btn {
+    width: 100%;
   }
 
   .search-bar {

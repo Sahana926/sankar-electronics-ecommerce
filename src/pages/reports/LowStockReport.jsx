@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getToken } from '../../utils/tokenManager'
+import { downloadReportPdf } from '../../utils/reportPdf'
 import AdminHeader from '../../components/AdminHeader'
 import '../AdminProducts.css'
 import '../reports.css'
@@ -60,6 +61,42 @@ function LowStockReport() {
     }
   }
 
+  const sortedProducts = [...products].sort((a, b) => {
+    const stockA = Array.isArray(a.colorVariants) && a.colorVariants.length > 0
+      ? a.colorVariants.reduce((sum, v) => sum + (v.stockQty || 0), 0)
+      : (a.stockQty || 0)
+    const stockB = Array.isArray(b.colorVariants) && b.colorVariants.length > 0
+      ? b.colorVariants.reduce((sum, v) => sum + (v.stockQty || 0), 0)
+      : (b.stockQty || 0)
+    return stockA - stockB
+  })
+
+  const handleDownloadPdf = () => {
+    downloadReportPdf({
+      title: 'Low Stock Items Report',
+      fileName: 'low-stock-report',
+      summaryLines: [
+        `Low Stock Products: ${products.length}`,
+        'Stock threshold: Less than 10 units',
+      ],
+      headers: ['Product Name', 'SKU', 'Category', 'Price', 'Stock Level', 'Status'],
+      rows: sortedProducts.map((product) => {
+        const actualStock = Array.isArray(product.colorVariants) && product.colorVariants.length > 0
+          ? product.colorVariants.reduce((sum, v) => sum + (v.stockQty || 0), 0)
+          : (product.stockQty || 0)
+
+        return [
+          product.name,
+          product.sku || '-',
+          product.category || '-',
+          `INR ${product.price ?? 0}`,
+          `${actualStock} units`,
+          product.status,
+        ]
+      }),
+    })
+  }
+
   if (loading) return <div className="admin-products"><div className="page-loading">Loading low stock products...</div></div>
 
   return (
@@ -72,9 +109,14 @@ function LowStockReport() {
               <h2 className="page-title">⚠️ Low Stock Items Report</h2>
               <p className="page-subtitle">Products with stock less than 10 units</p>
             </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
-              ← Back to Dashboard
-            </button>
+            <div className="report-header-actions">
+              <button className="btn btn-pdf-download" onClick={handleDownloadPdf}>
+                Download PDF
+              </button>
+              <button className="btn btn-secondary" onClick={() => navigate('/admin')}>
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
@@ -105,17 +147,7 @@ function LowStockReport() {
               </thead>
               <tbody>
                 {products.length > 0 ? (
-                  products
-                    .sort((a, b) => {
-                      const stockA = Array.isArray(a.colorVariants) && a.colorVariants.length > 0
-                        ? a.colorVariants.reduce((sum, v) => sum + (v.stockQty || 0), 0)
-                        : (a.stockQty || 0)
-                      const stockB = Array.isArray(b.colorVariants) && b.colorVariants.length > 0
-                        ? b.colorVariants.reduce((sum, v) => sum + (v.stockQty || 0), 0)
-                        : (b.stockQty || 0)
-                      return stockA - stockB
-                    })
-                    .map(product => {
+                  sortedProducts.map(product => {
                       const actualStock = Array.isArray(product.colorVariants) && product.colorVariants.length > 0
                         ? product.colorVariants.reduce((sum, v) => sum + (v.stockQty || 0), 0)
                         : (product.stockQty || 0)
