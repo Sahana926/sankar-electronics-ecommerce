@@ -1,9 +1,9 @@
 export const SITE_INFO = {
   brandName: 'Sankar Electrical and Hardwares',
   legalName: 'Sankar Electrical and Hardwares',
-  supportPhone: '+91 98765 43210',
-  supportEmail: 'support@sankarelectricals.com',
-  address: 'Your Store Address, City, State, India',
-  gstin: 'PENDING-GSTIN',
+  supportPhone: '9486169582',
+  supportEmail: 'adminsankar@gmail.com',
+  address: '49, KONGU MAIN ROAD, MS NAGAR, TIRUPUR',
+  gstin: '33ATNPS1882J1Z5',
   copyrightNotice: 'All rights reserved.',
 }
