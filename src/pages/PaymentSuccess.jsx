@@ -51,6 +51,9 @@ function PaymentSuccess() {
 
       if (response.ok) {
         const result = await response.json()
+        if (result?.order?._id) {
+          localStorage.setItem('latestOrderId', result.order._id)
+        }
         setOrderCreated(true)
         
         // Clear sessionStorage

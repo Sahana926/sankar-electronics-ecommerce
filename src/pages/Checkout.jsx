@@ -134,6 +134,11 @@ function Checkout() {
       })
 
       if (response.ok) {
+        const result = await response.json().catch(() => ({}))
+        if (result?.order?._id) {
+          localStorage.setItem('latestOrderId', result.order._id)
+        }
+
         // Clear sessionStorage
         sessionStorage.removeItem('checkoutData')
         
@@ -508,6 +513,11 @@ function Checkout() {
           throw new Error(error.message || 'Failed to create order')
         }
 
+        const createdOrder = await orderResponse.json().catch(() => ({}))
+        if (createdOrder?.order?._id) {
+          localStorage.setItem('latestOrderId', createdOrder.order._id)
+        }
+
         // Clear cart and redirect to success page
         sessionStorage.removeItem('checkoutData')
         sessionStorage.removeItem('pendingOrderDetails')
@@ -584,6 +594,10 @@ function Checkout() {
 
               if (!verifyResponse.ok || !result.success) {
                 throw new Error(result.message || 'Payment verification failed')
+              }
+
+              if (result?.order?._id) {
+                localStorage.setItem('latestOrderId', result.order._id)
               }
 
               // Clear cart and redirect to success page

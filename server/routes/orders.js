@@ -330,5 +330,26 @@ router.patch('/:orderId/return-request', authenticateToken, handleReturnRequest)
 // Compatibility endpoint for clients/proxies that block PATCH
 router.post('/:orderId/return-request', authenticateToken, handleReturnRequest)
 
+// Get a single order by ID for tracking/details
+router.get('/:orderId', authenticateToken, async (req, res) => {
+  try {
+    const { orderId } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ message: 'Invalid order ID' })
+    }
+
+    const order = await Order.findOne({ _id: orderId, user: req.user._id })
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' })
+    }
+
+    return res.json({ order })
+  } catch (error) {
+    console.error('Get single order error:', error)
+    return res.status(500).json({ message: 'Server error. Please try again later.' })
+  }
+})
+
 export default router
 

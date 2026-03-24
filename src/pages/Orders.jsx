@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { getToken } from '../utils/tokenManager'
+import { downloadInvoicePdf } from '../utils/invoicePdf'
 
 /**
  * Orders Component
@@ -26,6 +27,7 @@ function Orders() {
     }
   })
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(null)
+  const [latestOrderId, setLatestOrderId] = useState('')
   const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
   const RETURN_WINDOW_HOURS = 48
   const RETURN_WINDOW_MS = RETURN_WINDOW_HOURS * 60 * 60 * 1000
@@ -62,6 +64,15 @@ function Orders() {
       setOrders([])
     }
   }, [isAuthenticated])
+
+  useEffect(() => {
+    const storedLatest = localStorage.getItem('latestOrderId')
+    setLatestOrderId(storedLatest || '')
+  }, [])
+
+  const latestOrder = latestOrderId
+    ? orders.find((order) => order._id === latestOrderId)
+    : null
 
   const cancelOrder = async (orderId) => {
     if (!window.confirm('Are you sure you want to cancel this order?')) {
@@ -188,6 +199,14 @@ function Orders() {
     }
   }
 
+  const handleTrackOrder = (order) => {
+    navigate(`/track-order?orderId=${order._id}`)
+  }
+
+  const handleDownloadInvoice = (order) => {
+    downloadInvoicePdf(order, { email: order.userEmail })
+  }
+
   const getStatusStyles = (status) => {
     const map = {
       delivered: { color: '#1F7A47', bg: 'rgba(39, 174, 96, 0.12)', border: '#27ae60' },
@@ -271,6 +290,47 @@ function Orders() {
             </div>
           ) : (
             <div className="orders-list">
+              {latestOrder && (
+                <div
+                  style={{
+                    border: '1px solid #d1fae5',
+                    background: '#ecfdf5',
+                    color: '#065f46',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    marginBottom: '1rem',
+                    display: 'flex',
+                    gap: '.75rem',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div>
+                    <strong>Order Placed:</strong> {latestOrder.orderNumber}
+                    <div style={{ fontSize: '.9rem' }}>
+                      Your invoice is ready. You can download it now.
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+                    <button className="order-action-btn track-btn" onClick={() => handleDownloadInvoice(latestOrder)}>
+                      Download Invoice
+                    </button>
+                    <button className="order-action-btn" onClick={() => handleTrackOrder(latestOrder)}>
+                      Track This Order
+                    </button>
+                    <button
+                      className="order-action-btn cancel-btn"
+                      onClick={() => {
+                        localStorage.removeItem('latestOrderId')
+                        setLatestOrderId('')
+                      }}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )}
               {orders
                 .filter(order => showCancelled || order.status !== 'cancelled')
                 .map((order) => {
@@ -330,7 +390,8 @@ function Orders() {
                       <span>₹{order.total}</span>
                     </div>
                     <div className="order-actions">
-                      <button className="order-action-btn track-btn">Track Order</button>
+                      <button className="order-action-btn track-btn" onClick={() => handleTrackOrder(order)}>Track Order</button>
+                      <button className="order-action-btn" onClick={() => handleDownloadInvoice(order)}>Download Invoice</button>
                       {order.status === 'processing' && (
                         <button 
                           onClick={() => cancelOrder(order._id)}
