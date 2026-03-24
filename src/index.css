@@ -1535,6 +1535,15 @@ body {
     box-shadow: 0 8px 25px rgba(0, 200, 83, 0.5);
 }
 
+.cart-summary-actions {
+    margin-top: 1rem;
+}
+
+.buy-all-btn {
+    font-size: 1.15rem;
+    letter-spacing: 0.3px;
+}
+
 /* Wishlist Page Styles */
 .wishlist-grid {
     display: grid;

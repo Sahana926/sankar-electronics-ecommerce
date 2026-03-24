@@ -141,6 +141,30 @@ function Cart() {
     }))
   }
 
+  const handleBuyAllProducts = () => {
+    if (!cartItems || cartItems.length === 0) return
+
+    const checkoutItems = cartItems.map((item) => ({
+      id: item.productId,
+      productId: item.productId,
+      name: item.name || item.productName || 'Product',
+      description: item.description || '',
+      price: item.price,
+      quantity: item.quantity,
+      icon: '🛒',
+      category: item.category || 'General',
+      image: item.imageUrl,
+    }))
+
+    const checkoutData = {
+      items: checkoutItems,
+      total,
+    }
+
+    sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData))
+    navigate('/checkout')
+  }
+
   if (loading) {
     return (
       <main className="main-content">
@@ -302,6 +326,28 @@ function Cart() {
                     )}
                   </div>
                 ))}
+              </div>
+
+              <div className="cart-summary">
+                <h3 style={{ marginBottom: '1rem', color: '#2c3e50' }}>Cart Summary</h3>
+                <div className="summary-row">
+                  <span>Total Products:</span>
+                  <span>{cartItems.length}</span>
+                </div>
+                <div className="summary-row">
+                  <span>Total Quantity:</span>
+                  <span>{cartItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                </div>
+                <div className="summary-row total-row">
+                  <span>Total Amount:</span>
+                  <span>₹{total}</span>
+                </div>
+
+                <div className="cart-summary-actions">
+                  <button className="checkout-btn buy-all-btn" onClick={handleBuyAllProducts}>
+                    Buy All Products
+                  </button>
+                </div>
               </div>
             </>
           )}
