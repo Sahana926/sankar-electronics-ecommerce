@@ -139,13 +139,50 @@ router.post('/', authenticateToken, async (req, res) => {
 
     await order.save()
 
-    // Clear cart after order (if items came from cart)
-    if (!items || items.length === 0) {
-      const cart = await Cart.findOne({ user: req.user._id })
-      if (cart) {
+    // Sync cart after order so purchased items do not stay in cart.
+    const cart = await Cart.findOne({ user: req.user._id })
+    if (cart) {
+      if (!items || items.length === 0) {
+        // Order created from current cart: clear everything.
         cart.items = []
-        await cart.save()
+      } else {
+        // Order created from checkout payload: remove only purchased quantities.
+        const buildItemKey = (item) => {
+          if (item?.productId) return `pid:${String(item.productId)}`
+          return `fallback:${String(item?.name || '')}:${Number(item?.price || 0)}`
+        }
+
+        const removeQtyByKey = new Map()
+        for (const orderedItem of items) {
+          const key = buildItemKey(orderedItem)
+          const orderedQty = Math.max(1, Number(orderedItem?.quantity) || 1)
+          removeQtyByKey.set(key, (removeQtyByKey.get(key) || 0) + orderedQty)
+        }
+
+        const updatedItems = []
+        for (const cartItem of cart.items) {
+          const key = buildItemKey(cartItem)
+          const qtyToRemove = removeQtyByKey.get(key) || 0
+
+          if (qtyToRemove <= 0) {
+            updatedItems.push(cartItem)
+            continue
+          }
+
+          if (qtyToRemove >= cartItem.quantity) {
+            removeQtyByKey.set(key, qtyToRemove - cartItem.quantity)
+            continue
+          }
+
+          cartItem.quantity -= qtyToRemove
+          removeQtyByKey.set(key, 0)
+          updatedItems.push(cartItem)
+        }
+
+        cart.items = updatedItems
       }
+
+      await cart.save()
     }
 
     res.status(201).json({ message: 'Order created successfully', order })
