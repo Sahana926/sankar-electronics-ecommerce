@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getToken, getCurrentUser } from '../utils/tokenManager'
+import { getToken, getCurrentUser, isTokenExpired, clearAuthForContext } from '../utils/tokenManager'
 
 /**
  * AdminProtectedRoute - Protects admin-only routes
@@ -22,12 +22,15 @@ function AdminProtectedRoute({ children }) {
   // Get admin-specific token and user data
   const adminToken = getToken('admin')
   const adminUser = getCurrentUser('admin')
+  const hasValidAdminToken = !!adminToken && !isTokenExpired(adminToken)
   
-  const isAdminAuthenticated = !!adminToken
+  const isAdminAuthenticated = hasValidAdminToken
   const isAdminRole = adminUser && adminUser.role === 'admin'
 
   // Not authenticated - redirect to admin login
   if (!isAdminAuthenticated) {
+    // Remove stale admin data to avoid stuck state with expired tokens.
+    clearAuthForContext('admin')
     console.warn('⚠️ Admin access denied: No admin token found')
     return <Navigate to="/admin/login" state={{ from: location }} replace />
   }

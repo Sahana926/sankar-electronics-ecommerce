@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getToken, getCurrentUser } from '../utils/tokenManager'
+import { getToken, getCurrentUser, clearAuthForContext } from '../utils/tokenManager'
 import AdminHeader from '../components/AdminHeader'
 import './AdminDashboard.css'
 
@@ -20,6 +20,11 @@ function AdminDashboard() {
         const res = await fetch(`${API_BASE}/api/admin/metrics`, {
           headers: { Authorization: `Bearer ${token}` },
         })
+        if (res.status === 401) {
+          clearAuthForContext('admin')
+          navigate('/admin/login', { replace: true })
+          return
+        }
         const data = await res.json()
         if (!res.ok) throw new Error(data.message || 'Failed to load metrics')
         setMetrics(data)

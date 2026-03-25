@@ -121,6 +121,49 @@ export const isUserLoggedIn = () => {
 }
 
 /**
+ * Decode JWT payload safely.
+ * @param {string} token
+ * @returns {object|null}
+ */
+export const decodeJwtPayload = (token) => {
+  try {
+    if (!token || typeof token !== 'string') return null
+    const parts = token.split('.')
+    if (parts.length < 2) return null
+
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+    const payload = JSON.parse(atob(padded))
+    return payload && typeof payload === 'object' ? payload : null
+  } catch (error) {
+    console.error('Error decoding JWT payload:', error)
+    return null
+  }
+}
+
+/**
+ * Check whether JWT token has expired.
+ * @param {string} token
+ * @returns {boolean}
+ */
+export const isTokenExpired = (token) => {
+  const payload = decodeJwtPayload(token)
+  if (!payload || typeof payload.exp !== 'number') return true
+  const nowInSeconds = Math.floor(Date.now() / 1000)
+  return payload.exp <= nowInSeconds
+}
+
+/**
+ * Clear auth storage for a specific context.
+ * @param {string} context - 'admin' or 'user'
+ */
+export const clearAuthForContext = (context = 'user') => {
+  const { tokenKey, userKey } = getStorageKeys(context)
+  localStorage.removeItem(tokenKey)
+  localStorage.removeItem(userKey)
+}
+
+/**
  * Clear all authentication data (both admin and user)
  */
 export const clearAllAuth = () => {
