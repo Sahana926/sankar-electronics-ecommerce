@@ -14,6 +14,8 @@ import { validateEmail, getEmailErrorMessage, normalizeEmail } from '../utils/em
  */
 function Signup() {
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -180,104 +182,128 @@ function Signup() {
   }
 
   return (
-    <main className="main-content">
+    <main className="main-content auth-shell auth-shell-signup">
       <div className="container">
-        <div className="page-container">
-          <h2 className="page-title">Create Account</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="fullName">Full Name</label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                className={errors.fullName ? 'error' : ''}
-                placeholder="Enter your full name"
-              />
-              {errors.fullName && <span className="error-message">{errors.fullName}</span>}
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleEmailChange}
-                className={errors.email ? 'error' : ''}
-                placeholder="Enter your email (e.g., john.doe@example.com)"
-              />
-              {errors.email && (
-                <span className="error-message">
-                  ❌ {errors.email}
-                </span>
-              )}
-              {formData.email && !errors.email && (
-                <span style={{ fontSize: '0.85rem', color: '#27ae60', marginTop: '0.25rem', display: 'block' }}>
-                  ✓ Email format looks good
-                </span>
-              )}
-            </div>
-            <div className="form-group">
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className={errors.phone ? 'error' : ''}
-                placeholder="Enter your 10-digit phone number"
-              />
-              {errors.phone && <span className="error-message">{errors.phone}</span>}
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={errors.password ? 'error' : ''}
-                placeholder="Create a password (min 8 chars, letter, number, special char)"
-              />
-              {errors.password && <span className="error-message">{errors.password}</span>}
-            </div>
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={errors.confirmPassword ? 'error' : ''}
-                placeholder="Confirm your password"
-              />
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
-            </div>
-            {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
-            <button type="submit" className="btn" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Sign Up'}
-            </button>
-            <p style={{ textAlign: 'center', marginTop: '1rem', color: '#666' }}>
-              Already have an account?{' '}
-              <Link
-                to="/login"
-                style={{
-                  color: '#2c3e50',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                }}
-              >
-                Login here
-              </Link>
-            </p>
-          </form>
-        </div>
+        <section className="auth-layout-card" aria-label="User signup">
+          <aside className="auth-side-panel auth-side-panel-signup">
+            <p className="auth-kicker">Create your account</p>
+            <h2>Join thousands of builders</h2>
+            <p>Register once to unlock faster checkout, order history, and tailored product suggestions.</p>
+            <ul className="auth-benefit-list">
+              <li>Exclusive member-only offers</li>
+              <li>Saved addresses and profiles</li>
+              <li>Live delivery status updates</li>
+            </ul>
+          </aside>
+
+          <div className="page-container auth-form-panel">
+            <h2 className="page-title auth-page-title">Create Account</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="fullName">Full Name</label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className={errors.fullName ? 'error' : ''}
+                  placeholder="Enter your full name"
+                />
+                {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleEmailChange}
+                  className={errors.email ? 'error' : ''}
+                  placeholder="Enter your email (e.g., john.doe@example.com)"
+                />
+                {errors.email && (
+                  <span className="error-message">
+                    X {errors.email}
+                  </span>
+                )}
+                {formData.email && !errors.email && (
+                  <span className="field-success">
+                    Email format looks good
+                  </span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="phone">Phone Number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={errors.phone ? 'error' : ''}
+                  placeholder="Enter your 10-digit phone number"
+                />
+                {errors.phone && <span className="error-message">{errors.phone}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <div className="password-input-wrap">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={errors.password ? 'error' : ''}
+                    placeholder="Create a password (min 8 chars, letter, number, special char)"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                {errors.password && <span className="error-message">{errors.password}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <div className="password-input-wrap">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={errors.confirmPassword ? 'error' : ''}
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  >
+                    {showConfirmPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              </div>
+              {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
+              <button type="submit" className="btn auth-btn" disabled={loading}>
+                {loading ? 'Creating Account...' : 'Sign Up'}
+              </button>
+              <p className="auth-link-line">
+                Already have an account?{' '}
+                <Link to="/login" className="auth-link-primary">
+                  Login here
+                </Link>
+              </p>
+            </form>
+          </div>
+        </section>
       </div>
     </main>
   )

@@ -12,6 +12,11 @@ function Home() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const currentYear = new Date().getFullYear()
+  const highlights = [
+    { value: '12K+', label: 'Products in stock' },
+    { value: '48h', label: 'Fast dispatch in city' },
+    { value: '4.8/5', label: 'Customer satisfaction' },
+  ]
 
   // Handle Shop Now button click
   const handleShopNow = () => {
@@ -25,24 +30,40 @@ function Home() {
   }
 
   return (
-    <main className="main-content">
+    <main className="main-content home-innovation">
       <div className="container">
-        <div className="hero-section">
-          {/* Left Content Section */}
-          <div className="hero-left">
-            <h2 className="main-heading">
-              Sankar Electrical<br />and Hardwares
+        <section className="home-hero-v2">
+          <div className="hero-left hero-left-v2">
+            <p className="hero-kicker">Built for projects that cannot fail</p>
+            <h2 className="main-heading main-heading-v2">
+              Smarter Electrical and Hardware Shopping
             </h2>
-            <p className="tagline">
-              Your trusted source for quality electronics and hardware.
+            <p className="tagline tagline-v2">
+              Discover premium tools, electrical essentials, and construction-grade materials with real-time inventory and trusted support.
             </p>
-            <button onClick={handleShopNow} className="shop-now-btn">
-              Shop Now
-            </button>
+
+            <div className="hero-action-row">
+              <button onClick={handleShopNow} className="shop-now-btn shop-now-btn-v2">
+                Start Shopping
+              </button>
+              <Link to="/products" className="hero-secondary-link">
+                Explore Categories
+              </Link>
+            </div>
+
+            <div className="hero-stat-grid" aria-label="Store highlights">
+              {highlights.map((item) => (
+                <article key={item.label} className="hero-stat-card">
+                  <h3>{item.value}</h3>
+                  <p>{item.label}</p>
+                </article>
+              ))}
+            </div>
           </div>
 
-          {/* Right Image Section */}
-          <div className="hero-right">
+          <div className="hero-right hero-right-v2">
+            <div className="hero-swatch hero-swatch-one" aria-hidden="true" />
+            <div className="hero-swatch hero-swatch-two" aria-hidden="true" />
             <div className="hero-image-wrapper">
               <img
                 src="/hero-hardware.jpg"
@@ -51,8 +72,31 @@ function Home() {
                 loading="lazy"
               />
             </div>
+            <div className="hero-float-card hero-float-card-top" aria-hidden="true">
+              <span>Top pick</span>
+              <strong>Industrial Wiring Kits</strong>
+            </div>
+            <div className="hero-float-card hero-float-card-bottom" aria-hidden="true">
+              <span>Today only</span>
+              <strong>Bulk order savings up to 18%</strong>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section className="home-value-band" aria-label="Why customers choose us">
+          <article className="value-card">
+            <h3>Authentic Brands</h3>
+            <p>Sourced from verified distributors with quality checks before dispatch.</p>
+          </article>
+          <article className="value-card">
+            <h3>Instant Assistance</h3>
+            <p>Get support for product compatibility, installation, and order tracking.</p>
+          </article>
+          <article className="value-card">
+            <h3>Secure Checkout</h3>
+            <p>UPI, cards, and net banking through trusted payment partners.</p>
+          </article>
+        </section>
       </div>
 
       <footer className="home-footer" aria-label="Footer">

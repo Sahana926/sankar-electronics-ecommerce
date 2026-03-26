@@ -16,6 +16,7 @@ function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
+  const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -163,78 +164,87 @@ function Login() {
   }
 
   return (
-    <main className="main-content">
+    <main className="main-content auth-shell auth-shell-login">
       <div className="container">
-        <div className="page-container">
-          <h2 className="page-title">Login</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleEmailChange}
-                className={errors.email ? 'error' : ''}
-                placeholder="Enter your email (e.g., john.doe@example.com)"
-              />
-              {errors.email && (
-                <span className="error-message">
-                  ❌ {errors.email}
-                </span>
-              )}
-              {formData.email && !errors.email && (
-                <span style={{ fontSize: '0.85rem', color: '#27ae60', marginTop: '0.25rem', display: 'block' }}>
-                  ✓ Email format looks good
-                </span>
-              )}
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={errors.password ? 'error' : ''}
-                placeholder="Enter your password"
-              />
-              {errors.password && <span className="error-message">{errors.password}</span>}
-            </div>
-            {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
-            <button type="submit" className="btn" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-            <p style={{ textAlign: 'center', marginTop: '1rem', color: '#666' }}>
-              Don't have an account?{' '}
-              <Link
-                to="/signup"
-                style={{
-                  color: '#2c3e50',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                }}
-              >
-                Sign up here
-              </Link>
-            </p>
-            <p style={{ textAlign: 'center', marginTop: '0.75rem', color: '#666', fontSize: '0.9rem' }}>
-              Are you an admin?{' '}
-              <Link
-                to="/admin/login"
-                style={{
-                  color: '#2874f0',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                }}
-              >
-                Use Admin Login
-              </Link>
-            </p>
-          </form>
-        </div>
+        <section className="auth-layout-card" aria-label="User login">
+          <aside className="auth-side-panel">
+            <p className="auth-kicker">Welcome back</p>
+            <h2>Power your next project</h2>
+            <p>Sign in to access cart, wishlist, order tracking, and personalized recommendations.</p>
+            <ul className="auth-benefit-list">
+              <li>Real-time stock updates</li>
+              <li>Fast repeat orders</li>
+              <li>Secure payment experience</li>
+            </ul>
+          </aside>
+
+          <div className="page-container auth-form-panel">
+            <h2 className="page-title auth-page-title">Login</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="email">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleEmailChange}
+                  className={errors.email ? 'error' : ''}
+                  placeholder="Enter your email (e.g., john.doe@example.com)"
+                />
+                {errors.email && (
+                  <span className="error-message">
+                    X {errors.email}
+                  </span>
+                )}
+                {formData.email && !errors.email && (
+                  <span className="field-success">
+                    Email format looks good
+                  </span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <div className="password-input-wrap">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={errors.password ? 'error' : ''}
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                {errors.password && <span className="error-message">{errors.password}</span>}
+              </div>
+              {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
+              <button type="submit" className="btn auth-btn" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+
+              <p className="auth-link-line">
+                Don't have an account?{' '}
+                <Link to="/signup" className="auth-link-primary">
+                  Sign up here
+                </Link>
+              </p>
+              <p className="auth-link-line auth-link-line-secondary">
+                Are you an admin?{' '}
+                <Link to="/admin/login" className="auth-link-accent">
+                  Use Admin Login
+                </Link>
+              </p>
+            </form>
+          </div>
+        </section>
       </div>
     </main>
   )
