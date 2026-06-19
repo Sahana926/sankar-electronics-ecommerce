@@ -12,7 +12,7 @@ export const useCounts = () => {
   const [ordersCount, setOrdersCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5001' : 'https://sankar-electronics-backend.onrender.com')
 
   const fetchWithTimeout = async (url, options = {}, timeout = 4000) => {
     const controller = new AbortController()

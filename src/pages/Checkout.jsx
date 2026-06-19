@@ -35,7 +35,7 @@ function Checkout() {
   const [verifyingUpi, setVerifyingUpi] = useState(false)
   const [shippingInfo, setShippingInfo] = useState(null)
   const [calculatingShipping, setCalculatingShipping] = useState(false)
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5001' : 'https://sankar-electronics-backend.onrender.com')
   const OWNER_UPI_ID = 'sahanasahana64899@okicici' // Owner's UPI ID where payments will be received
   const [razorpayReady, setRazorpayReady] = useState(false)
   const [showWaiting, setShowWaiting] = useState(false)

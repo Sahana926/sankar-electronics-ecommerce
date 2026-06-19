@@ -16,7 +16,7 @@ function MCBDistribution() {
   const [wishlistItems, setWishlistItems] = useState([])
   const [selectedSubcategories, setSelectedSubcategories] = useState([])
   const [openDropdown, setOpenDropdown] = useState(null)
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5001' : 'https://sankar-electronics-backend.onrender.com')
 
   const categoryData = {
     electronics: {

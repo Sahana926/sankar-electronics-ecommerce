@@ -5,7 +5,7 @@ import AdminHeader from '../components/AdminHeader'
 import { getToken } from '../utils/tokenManager'
 import './AdminProductEdit.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5001' : 'https://sankar-electronics-backend.onrender.com')
 
 function AdminProductEdit() {
   const { id } = useParams()

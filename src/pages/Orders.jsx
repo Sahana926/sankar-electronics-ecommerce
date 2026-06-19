@@ -28,7 +28,7 @@ function Orders() {
   })
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(null)
   const [latestOrderId, setLatestOrderId] = useState('')
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001'
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5001' : 'https://sankar-electronics-backend.onrender.com')
   const RETURN_WINDOW_HOURS = 48
   const RETURN_WINDOW_MS = RETURN_WINDOW_HOURS * 60 * 60 * 1000
 
