@@ -75,23 +75,24 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sankar_electrical';
 
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
+const connectToDatabase = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB');
     console.log(`📦 Database: ${mongoose.connection.name}`);
     console.log(`🖥️  Host: ${mongoose.connection.host}`);
     const isAtlas = MONGODB_URI.includes('mongodb+srv');
     console.log(`🌐 Connection Type: ${isAtlas ? 'MongoDB Atlas (Cloud)' : 'Local MongoDB'}`);
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    console.log('💡 Make sure MongoDB is running or update MONGODB_URI in .env file');
+    console.log('💡 The API will keep running, but database-backed routes will be unavailable until MONGODB_URI is fixed.');
     console.log('📝 For MongoDB Atlas, ensure:');
     console.log('   - IP is whitelisted in Network Access');
     console.log('   - Connection string has correct username/password');
-    process.exit(1);
-  });
+  }
+};
+
+connectToDatabase();
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
